@@ -1,29 +1,31 @@
-# siteminder
+# Siteminder Project
 
 ## Project setup
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads for local development
+
 ```
 npm run serve
 ```
 
 ### Compiles and minifies for production
+
 ```
 npm run build
 ```
 
-### Run your tests
-```
-npm run test
-```
+## Project Structure & Components Overview
 
-### Lints and fixes files
-```
-npm run lint
-```
+App.vue --> contains the left and right panes, where
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+    Left Pane - contains the search box, movies list and pagination components
+
+    Right Pane - Movie preview including text and Poster
+
+Movies List --> holds the list of all movies retrieved for a given search term (shows some dummy data upon initial load)
+
+Single Movie Preview --> Uses the Id of a given movie, to fetch further details from OMDB like duration, Actors,etc.

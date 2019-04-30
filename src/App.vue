@@ -1,28 +1,110 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-container fluid>
+      <v-layout>
+        <!-- Left Pane starts here -->
+        <v-flex xs12 sm10 md4 class="mx-auto px-3">
+          <!-- Search field in top left corner -->
+          <!-- caters for search icon click or "Enter" key on keyboard to find movies -->
+          <v-text-field
+            clearable
+            append-icon="search"
+            @click:append="searchMovies"
+            label="Type a movie name to search"
+            v-model="searchTerm"
+            @keyup.enter="searchMovies"
+          ></v-text-field>
+
+          <!-- spinner while search results are retrieved  -->
+          <v-progress-circular v-if="showSpinner" :size="50" color="primary" indeterminate></v-progress-circular>
+
+          <!-- list of movies showing year of release and title -->
+          <MoviesList
+            v-else
+            :searchedItems="searchedItems"
+            :currentItemclicked.sync="currentItemclicked"
+          />
+
+          <!-- Pagination component, only shows up if total Results > 10 -->
+          <v-pagination
+            v-if="totalResults && totalResults>10"
+            v-model="pageCount"
+            :length="numberOfPages"
+          ></v-pagination>
+        </v-flex>
+
+        <!-- Right Pane Component starts here -->
+        <!-- this shows the movie Preview -->
+        <SingleMoviePreview :movieId="currentItemclicked.imdbID"></SingleMoviePreview>
+      </v-layout>
+    </v-container>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import SingleMoviePreview from "./components/SingleMoviePreview.vue";
+import MoviesList from "./components/MoviesList.vue";
+import SampleData from "./sample-data.js";
 export default {
-  name: 'app',
+  name: "App",
   components: {
-    HelloWorld
+    SingleMoviePreview: SingleMoviePreview,
+    MoviesList: MoviesList
+  },
+  data() {
+    return {
+      showSpinner: false,
+      searchTerm: "",
+      currentItemclicked: {},
+      pageCount: 1,
+      totalResults: null,
+      searchedItems: []
+    };
+  },
+  computed: {
+    numberOfPages() {
+      return this.totalResults ? Math.floor(this.totalResults / 10) : 0;
+    }
+  },
+  methods: {
+    searchMovies() {
+      this.searchTerm ? this.makeRequestToAPI() : null;
+    },
+    makeRequestToAPI() {
+      fetch(
+        `http://www.omdbapi.com/?s=${this.searchTerm}&apikey=6bfd9a64&page=${
+          this.pageCount
+        }`
+      )
+        .then(res => res.json())
+        .then(data => {
+          console.log("finaldata", data);
+          if (data.Response === "True") {
+            this.searchedItems = data.Search;
+            this.totalResults = data.totalResults;
+          } else {
+            this.searchedItems = [];
+          }
+        })
+        .catch(err => {
+          console.log("error", err);
+          alert("Sorry couldn't find any search results");
+        });
+    }
+  },
+  mounted() {
+    // Fills the searchedItems Array with some starting dummy data
+    this.searchedItems = SampleData;
+  },
+  watch: {
+    // whenever pageCount changes, try and fetch the next 10 movies
+    pageCount() {
+      this.searchMovies();
+    }
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
+<style scoped>
 </style>
