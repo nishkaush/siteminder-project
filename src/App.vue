@@ -32,7 +32,6 @@
 
         <!-- Right Pane Component starts here -->
         <!-- this shows the movie Preview -->
-        <!-- :movieId="currentItemclicked.imdbID" -->
         <SingleMoviePreview></SingleMoviePreview>
       </v-layout>
     </v-container>
@@ -53,10 +52,7 @@ export default {
     return {
       showSpinner: false,
       searchTerm: "",
-      // currentItemclicked: {},
       pageCount: 1
-      // totalResults: null,
-      // searchedItems: []
     };
   },
   computed: {
@@ -72,39 +68,17 @@ export default {
   },
   methods: {
     searchMovies() {
-      // this.searchTerm ? this.makeRequestToAPI() : null;
       if (this.searchTerm) {
-        this.$store.dispatch("fetchSearchResults", {
+        let objToPass = {
           searchTerm: this.searchTerm,
           pageCount: this.pageCount
-        });
+        };
+        this.$store.dispatch("fetchSearchResults", objToPass);
       }
-    },
-    makeRequestToAPI() {
-      // fetch(
-      //   `http://www.omdbapi.com/?s=${this.searchTerm}&apikey=6bfd9a64&page=${
-      //     this.pageCount
-      //   }`
-      // )
-      //   .then(res => res.json())
-      //   .then(data => {
-      //     console.log("finaldata", data);
-      //     if (data.Response === "True") {
-      //       this.searchedItems = data.Search;
-      //       this.totalResults = data.totalResults;
-      //     } else {
-      //       this.searchedItems = [];
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log("error", err);
-      //     alert("Sorry couldn't find any search results");
-      //   });
     }
   },
   mounted() {
     // Fills the searchedItems Array with some starting dummy data
-    // this.searchedItems = SampleData;
     this.$store.commit("updateSearchedItems", {
       resultsArr: SampleData,
       totalResults: SampleData.length

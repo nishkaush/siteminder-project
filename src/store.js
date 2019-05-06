@@ -25,26 +25,17 @@ export default new Vuex.Store({
   actions: {
     fetchSearchResults(context, { searchTerm, pageCount }) {
       fetch(
-        `http://www.omdbapi.com/?s=${searchTerm}&apikey=6bfd9a64&page=${pageCount}`
+        `http://www.omdbapi.com/?s=${searchTerm}&apikey=${
+          process.env.VUE_APP_APIKEY
+        }&page=${pageCount}`
       )
         .then(res => res.json())
         .then(data => {
-          console.log("finaldata", data);
-
-          if (data.Response === "True") {
-            let objToPass = {
-              resultsArr: data.Search,
-              totalResults: data.totalResults
-            };
-            context.commit("updateSearchedItems", objToPass);
-            // this.searchedItems = data.Search;
-            // this.totalResults = data.totalResults;
-          } else {
-            context.commit("updateSearchedItems", {
-              resultsArr: [],
-              totalResults: 0
-            });
-          }
+          let objToPass = {
+            resultsArr: data.Response === "True" ? data.Search : [],
+            totalResults: data.Response === "True" ? data.totalResults : 0
+          };
+          context.commit("updateSearchedItems", objToPass);
         })
         .catch(err => {
           console.log("error", err);
@@ -53,11 +44,13 @@ export default new Vuex.Store({
     },
     fetchMoreInfoOnCurrentItem(context, movieId) {
       context.commit("updateSpinner", true);
-      fetch(`http://www.omdbapi.com/?i=${movieId}&apikey=6bfd9a64&plot=long`)
+      fetch(
+        `http://www.omdbapi.com/?i=${movieId}&apikey=${
+          process.env.VUE_APP_APIKEY
+        }&plot=long`
+      )
         .then(res => res.json())
         .then(data => {
-          // this.currentItem = data;
-          // this.showSpinner = false;
           context.commit("updateCurrentItemClicked", data);
           context.commit("updateSpinner", false);
         })

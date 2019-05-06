@@ -55,13 +55,6 @@
 
 <script>
 export default {
-  // props: ["movieId"],
-  data() {
-    return {
-      // currentItem: {}
-      // showSpinner: false
-    };
-  },
   computed: {
     showSpinner() {
       return this.$store.state.showSpinner;
@@ -75,7 +68,6 @@ export default {
   },
   watch: {
     movieId(val) {
-      // this.showSpinner = true;
       if (val) {
         this.$store.dispatch("fetchMoreInfoOnCurrentItem", val);
       }
