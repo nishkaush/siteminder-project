@@ -28,11 +28,17 @@
 
 <script>
 export default {
-  props: ["searchedItems", "currentItemclicked"],
+  props: ["searchedItems"],
   methods: {
     showItem(item) {
       // tells parent component to update the current item to be viewed in Preview
-      this.$emit("update:currentItemclicked", item);
+      // this.$emit("update:currentItemclicked", item);
+      this.$store.commit("updateCurrentItemClicked", item);
+    }
+  },
+  computed: {
+    currentItemclicked() {
+      return this.$store.state.currentItemclicked;
     }
   }
 };

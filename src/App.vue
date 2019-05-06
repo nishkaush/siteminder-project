@@ -19,11 +19,8 @@
           <v-progress-circular v-if="showSpinner" :size="50" color="primary" indeterminate></v-progress-circular>
 
           <!-- list of movies showing year of release and title -->
-          <MoviesList
-            v-else
-            :searchedItems="searchedItems"
-            :currentItemclicked.sync="currentItemclicked"
-          />
+          <MoviesList v-else :searchedItems="searchedItems"/>
+          <!-- :currentItemclicked.sync="currentItemclicked" -->
 
           <!-- Pagination component, only shows up if total Results > 10 -->
           <v-pagination
@@ -35,7 +32,8 @@
 
         <!-- Right Pane Component starts here -->
         <!-- this shows the movie Preview -->
-        <SingleMoviePreview :movieId="currentItemclicked.imdbID"></SingleMoviePreview>
+        <!-- :movieId="currentItemclicked.imdbID" -->
+        <SingleMoviePreview></SingleMoviePreview>
       </v-layout>
     </v-container>
   </v-app>
@@ -55,46 +53,62 @@ export default {
     return {
       showSpinner: false,
       searchTerm: "",
-      currentItemclicked: {},
-      pageCount: 1,
-      totalResults: null,
-      searchedItems: []
+      // currentItemclicked: {},
+      pageCount: 1
+      // totalResults: null,
+      // searchedItems: []
     };
   },
   computed: {
     numberOfPages() {
       return this.totalResults ? Math.floor(this.totalResults / 10) : 0;
+    },
+    totalResults() {
+      return this.$store.state.totalResults;
+    },
+    searchedItems() {
+      return this.$store.state.searchedItems;
     }
   },
   methods: {
     searchMovies() {
-      this.searchTerm ? this.makeRequestToAPI() : null;
+      // this.searchTerm ? this.makeRequestToAPI() : null;
+      if (this.searchTerm) {
+        this.$store.dispatch("fetchSearchResults", {
+          searchTerm: this.searchTerm,
+          pageCount: this.pageCount
+        });
+      }
     },
     makeRequestToAPI() {
-      fetch(
-        `http://www.omdbapi.com/?s=${this.searchTerm}&apikey=6bfd9a64&page=${
-          this.pageCount
-        }`
-      )
-        .then(res => res.json())
-        .then(data => {
-          console.log("finaldata", data);
-          if (data.Response === "True") {
-            this.searchedItems = data.Search;
-            this.totalResults = data.totalResults;
-          } else {
-            this.searchedItems = [];
-          }
-        })
-        .catch(err => {
-          console.log("error", err);
-          alert("Sorry couldn't find any search results");
-        });
+      // fetch(
+      //   `http://www.omdbapi.com/?s=${this.searchTerm}&apikey=6bfd9a64&page=${
+      //     this.pageCount
+      //   }`
+      // )
+      //   .then(res => res.json())
+      //   .then(data => {
+      //     console.log("finaldata", data);
+      //     if (data.Response === "True") {
+      //       this.searchedItems = data.Search;
+      //       this.totalResults = data.totalResults;
+      //     } else {
+      //       this.searchedItems = [];
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("error", err);
+      //     alert("Sorry couldn't find any search results");
+      //   });
     }
   },
   mounted() {
     // Fills the searchedItems Array with some starting dummy data
-    this.searchedItems = SampleData;
+    // this.searchedItems = SampleData;
+    this.$store.commit("updateSearchedItems", {
+      resultsArr: SampleData,
+      totalResults: SampleData.length
+    });
   },
   watch: {
     // whenever pageCount changes, try and fetch the next 10 movies

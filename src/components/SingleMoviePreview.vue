@@ -55,30 +55,30 @@
 
 <script>
 export default {
-  props: ["movieId"],
+  // props: ["movieId"],
   data() {
     return {
-      currentItem: {},
-      showSpinner: false
+      // currentItem: {}
+      // showSpinner: false
     };
   },
-  watch: {
+  computed: {
+    showSpinner() {
+      return this.$store.state.showSpinner;
+    },
+    currentItem() {
+      return this.$store.state.currentItemclicked;
+    },
     movieId() {
-      this.showSpinner = true;
-      fetch(
-        `http://www.omdbapi.com/?i=${this.movieId}&apikey=6bfd9a64&plot=long`
-      )
-        .then(res => res.json())
-        .then(data => {
-          this.currentItem = data;
-          this.showSpinner = false;
-        })
-        .catch(err => {
-          console.log("erro", err);
-          alert(
-            "Sorry Couldn't get detailed movie information, please try again later"
-          );
-        });
+      return this.currentItem.imdbID || "";
+    }
+  },
+  watch: {
+    movieId(val) {
+      // this.showSpinner = true;
+      if (val) {
+        this.$store.dispatch("fetchMoreInfoOnCurrentItem", val);
+      }
     }
   }
 };
